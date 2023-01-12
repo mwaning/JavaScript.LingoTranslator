@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+
+body {
+  font-family:corbel;
+  margin:0;
+  padding:0;
+}
+
+div {
+  box-sizing:border-box;
+}
+
+a {
+  color:#2889B5;
+  text-decoration:none;
+}
+
+a:hover {
+  color:#045377;
+}
+
+input {
+  border:0.1vw solid #000000;
+  height:4vh;
+  padding-left:1vw;
+  margin-bottom:0.5vw;
+  width:26vw;
+}
+
+input[type=submit] {
+  background-color:#FFFFFF;
+  border-radius:0 0.5vw 0.5vw 0;
+  color:#333333;
+  cursor:pointer; 
+  margin:0.2vw 0 0 -0.4vw;
+  padding:0.45vh 0 3.9vh 0;
+  width:3vw;
+}
+
+input[type=submit]:hover {
+  background-color:#E4E5E6;
+}
+
+input[type=text]:focus {
+  box-shadow:0 0 0.25vw 0.15vw #fb9665;
+  outline:none;
+  z-index:1;
+}
+
+input[type=number] {
+  border-radius:0;
+  cursor:pointer;
+  
+  text-align:center;
+  width:3vw;
+  user-select:none;
+}
+#NL-select { 
+  background-color: rgb(255, 132, 73);
+  border-radius:0.5vw 0 0 0.5vw; 
+  margin-right:-0.1vw;
+}
+
+#EN-select { margin-right:-0.5vw; }
+
+input[type=number]:focus {
+  outline:none;
+}
+
+#logo {
+  border:0.15vw solid #FFFFFF;
+  border-radius:1vw;
+  color:#FFFFFF;
+  font-size:2vw;
+  font-weight:bold;
+  margin:0.25vw;
+  position:absolute;
+  padding:0.25vw;
+  z-index:1;
+}
+
+#header1 {
+  border-right:4vw solid rgba(0,0,0,0);
+  border-top:4vw solid #C14604;
+  position:absolute;
+  width:47.5vw;
+}
+
+#header2 {
+  background-color:;
+  border-right:4vw solid rgba(0,0,0,0);
+  border-top:4vw solid #F26422;
+  position:absolute;
+  width:70vw; 
+}
+
+#title-container {
+  font-size:1vw;
+  font-weight:bold;
+  padding:9vh 0 2vh 1.5vw;
+}
+
+#title1 {
+  color:#F4722C;
+  font-size:2.5vw;
+}
+
+#title2 {
+  color:#237897;
+  font-size:2.5vw;
+  font-weight:400;
+}
+
+#search-background {
+  background: linear-gradient(90deg, rgba(193,70,4,1) 0%, rgba(242,100,34,1) 50%, rgba(251,150,101,1) 100%);
+  padding:3.25vh 0 2vh 5vw;
+  width:100%;
+}
+
+#search-results {
+  background-color:#FFFFFF;
+  border-collapse:collapse;
+  color:#FFFFFF;
+  margin:1.5vw 10vw 0 10vw;
+}
+
+#search-results td, th {
+  border:0.1vw solid #EAEBED;
+  color:#000000;
+  font-size:1.5vw;
+  font-weight:600;
+  padding:0.75vw;
+  text-align:left;
+}
+.NL-text { background-color:#F4722C; }
+.EN-text { background-color:#1190C9; }
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
+</style>
+</head>
+<body>
+
+  <div id="header-container">
+    <div id="logo">Logo</div>
+    <div id="header2"></div>
+    <div id="header1"></div>
+  </div>
+
+  <div id="title-container">
+    <span id="title1">Lingo</span>
+    <span id="title2">Translator</span>
+    <div>A dictionary of standardized NL-EN lingo.</div>
+  </div>
+
+  <div id="search-background">
+    <div id="search-box">
+      <form id="search-form">
+<input id="NL-select" type="number" placeholder="NL" readonly><input id="EN-select" type="number" placeholder="EN" readonly>
+        <input type="text" id="lingo-search" placeholder="Search for lingo, keywords separated by comma">
+        <input type="submit" value="🔍">
+      </form>
+    </div>
+  </div>
+
+  <table id='search-results'></table>
+
+</body>
+<script src="database.js"></script>	
+<script>
+
+var listNL = []; 
+var listEN = []; 
+
+parseJSON();
+languageSelect();
+getTranslation();
+
+function parseJSON() {
+  // var database is from the file database.js
+  var parseNL = JSON.parse(database);
+  listNL.push(parseNL.map(a => a.NL));
+  listNL = Array.from(listNL[0].values());
+
+  var parseEN = JSON.parse(database);
+  listEN.push(parseEN.map(a => a.EN));
+  listEN = Array.from(listEN[0].values());
+}
+
+function languageSelect() {
+  var NLSelect = document.getElementById("NL-select");
+  var ENSelect = document.getElementById("EN-select");
+  var searchResults = document.getElementById("search-results");
+
+  NLSelect.addEventListener("click", function(event) {
+    NLSelect.style.backgroundColor = "#FF8449";
+    ENSelect.style.backgroundColor = "#FFFFFF";
+    searchResults.innerHTML = "";
+  });
+  ENSelect.addEventListener("click", function(event) {
+    ENSelect.style.backgroundColor = "#FF8449";
+    NLSelect.style.backgroundColor = "#FFFFFF";
+    searchResults.innerHTML = "";
+  });
+
+  if (NLSelect.style.backgroundColor == "rgb(255, 132, 73)") { return "NL"; }
+  else if (ENSelect.style.backgroundColor == "rgb(255, 132, 73)") { return "EN"; }
+  else { return "NL"; console.log("?"); }
+}
+
+function getTranslation() {
+  var lingoSearch = document.getElementById("lingo-search");
+  var searchResults = document.getElementById("search-results");
+  var searchForm = document.getElementById("search-form");  
+
+
+  searchForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    var searchArray = lingoSearch.value.toLowerCase().split(",");
+    var language = languageSelect();
+
+    
+    
+    if (language == "NL") {
+      searchResults.innerHTML = "<tr><th class='NL-text'>NL results for '" + lingoSearch.value + "' </th><th class='EN-text'>EN translations</th></tr>";
+      for (var i=0; i<listNL.length; i++) {
+        if (searchArray.every(lingo => listNL[i].toLowerCase().includes(lingo))) {	
+          searchResults.innerHTML += "<tr><td>" + listNL[i] + "</td><td>" + listEN[i] + "</td></tr>";
+        }
+      }
+    }
+    else if (language == "EN") {
+      searchResults.innerHTML = "<tr><th class='EN-text'>EN results for '" + lingoSearch.value + "' </th><th class='NL-text'>NL translations</th></tr>";
+      for (var i=0; i<listEN.length; i++) {
+        if (searchArray.every(lingo => listEN[i].toLowerCase().includes(lingo))) {
+          searchResults.innerHTML += "<tr><td>" + listEN[i] + "</td><td>" + listNL[i] + "</td></tr>";
+        }
+      }
+    }
+  }); 
+}
+
+</script>
+</html>
